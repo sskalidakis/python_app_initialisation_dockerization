@@ -1,0 +1,44 @@
+version: '3.7'
+
+networks:
+  test_module:
+    driver: bridge
+
+volumes:
+  postgres_db:
+
+services:
+  postgres_db:
+    image: postgres:11
+    hostname: ${POSTGRES_HOST}
+    container_name: postgres_db
+    restart: always
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_db:/var/lib/postgresql/data
+      - ../postgres_schema/my_schema.sql:/docker-entrypoint-initdb.d/my_schema.sql
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    networks:
+      - test_module
+
+  test_function:
+    hostname: test_function
+    container_name: test_function
+    restart: always
+    build:
+      context: ".."
+      dockerfile: config/Dockerfile
+    environment:
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+
+    depends_on:
+      - postgres_db
+    networks:
+      - test_module
