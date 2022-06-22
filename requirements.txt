@@ -1,4 +1,4 @@
-numpy==1.18.1
+numpy==1.22.0
 postgres==3.0.0
 psycopg2-binary==2.8.4
 psycopg2-pool==1.1
